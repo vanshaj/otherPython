@@ -2,7 +2,7 @@
 import os
 import requests
 import timeit
-
+import threading
 
 def downloadImage(imagePath,fileName):
    with open(fileName,'wb') as imageWrite: # will open the file in write mode as binary file
@@ -14,12 +14,20 @@ def downloadImage(imagePath,fileName):
                break
            imageWrite.write(block)
 
-if __name__ == '__main__':
-    start=timeit.default_timer()
-    for i in range(10):
+def mythread(i):
         imagePath="https://fakeimg.pl/350x200/?text=Hell"+str(i)
         fileName="Hell"+str(i)
         filePath=os.getcwd()+'\\..\\resource\\'+fileName
         downloadImage(imagePath,filePath)
+
+if __name__ == '__main__':
+    start=timeit.default_timer()
+    threads=[] # Creation of list of threads will store reference to all of our threads
+    for i in range(10):
+        thread = threading.Thread(target=mythread,args=(i,)) # will create a thread target will be the method to be executed for our thread and args will contain the arguments
+        threads.append(thread) # will append the thread in our list
+        thread.start() # will actually start the thread
+    for i in threads:
+        i.join() # will wait for all threads to execute before logging time
     end=timeit.default_timer()
     print(end-start)
